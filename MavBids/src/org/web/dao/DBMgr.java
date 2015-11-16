@@ -10,6 +10,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Component;
 import org.web.beans.Category;
+import org.web.beans.Image;
 import org.web.beans.UserProfile;
 
 @Component
@@ -56,5 +57,28 @@ public class DBMgr {
 
 	public String removeCategory(Category c){
 		return null;
+	}
+
+	public boolean saveImage(Image img){
+
+		Transaction tx = null;
+		Session session = factory.openSession();
+		tx = session.beginTransaction();
+
+		session.save(img);
+		tx.commit();
+
+		session.close();
+		return true;
+	}
+
+	public byte[] getImage(Image img){
+		Transaction tx = null;
+		Session session = factory.openSession();
+
+		Image image = (Image) session.get(Image.class, img.getImageId());
+
+		session.close();
+		return image.getImage();
 	}
 }

@@ -12,4 +12,12 @@
 		<property name="lastName" column="Lastname"></property>
 	</class>
 
+	<class name="org.web.beans.Image" table="images">
+		<id name="imageId" type="int" column="imageId">
+			<generator class="increment"></generator>
+		</id>
+		<property name="image" type="binary">
+			<column name="image" not-null="true" />
+		</property>
+	</class>
 </hibernate-mapping>
