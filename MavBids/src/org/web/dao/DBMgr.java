@@ -72,13 +72,12 @@ public class DBMgr {
 		return true;
 	}
 
-	public byte[] getImage(Image img){
-		Transaction tx = null;
+	public Image getImage(int imageId){
 		Session session = factory.openSession();
 
-		Image image = (Image) session.get(Image.class, img.getImageId());
+		Image image = (Image) session.get(Image.class, imageId);
 
 		session.close();
-		return image.getImage();
+		return image;
 	}
 }

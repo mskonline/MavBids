@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,11 +28,13 @@ public class AdvController {
 	public @ResponseBody String uploadAdvImage(@RequestParam("file") MultipartFile file){
 
 		if(!file.isEmpty()){
+			logger.info("Content type : " + file.getContentType());
 			byte[] imgData = null;
 			try {
 				imgData = file.getBytes();
 			} catch (IOException e) {
 				e.printStackTrace();
+				return "false";
 			}
 
 			if(imgData != null){
@@ -44,10 +48,20 @@ public class AdvController {
 			return "false";
 	}
 
-	@RequestMapping(value = "/getAdvImage", method = RequestMethod.GET,produces = MediaType.IMAGE_JPEG_VALUE)
-	public @ResponseBody byte[] getAdvImage(@RequestParam("id") String id){
-		Image img = new Image();
-		img.setImageId(Integer.parseInt(id));
-		return dbMgr.getImage(img);
+	@RequestMapping(value = "/getAdvImage", method = RequestMethod.GET)
+	public @ResponseBody HttpEntity<byte[]> getAdvImage(@RequestParam("id") String id){
+		int imageId = Integer.parseInt(id);
+
+		Image img = dbMgr.getImage(imageId);
+
+		if (img != null){
+			HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.IMAGE_JPEG);
+	        headers.setContentLength(img.getImage().length);
+	        return new HttpEntity<byte[]>(img.getImage(), headers);
+		} else {
+			//TODO How about sending some default image ?
+			return null;
+		}
 	}
 }
