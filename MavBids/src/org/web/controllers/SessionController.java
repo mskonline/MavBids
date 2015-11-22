@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 import org.web.beans.UserProfile;
 import org.web.dao.DBMgr;
 
@@ -28,7 +26,7 @@ public class SessionController {
 
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	@ResponseBody
-	public String login(HttpSession session,String userName, String passwd){
+	public String login(HttpSession session, String userName, String passwd){
 		logger.info("Login Page");
 		session.setAttribute("hasAccess", "true");
 		return "Login";
@@ -56,13 +54,4 @@ public class SessionController {
 
 		return "{}";
 	}
-
-	@RequestMapping(value = "/uploadAdvImage", method = RequestMethod.GET)
-	@ResponseBody
-	public String uploadAdvImage(@RequestParam("file") MultipartFile advImg){
-
-
-		return "{}";
-	}
-
 }

@@ -56,6 +56,7 @@ public class AdvController {
 
 		if (img != null){
 			HttpHeaders headers = new HttpHeaders();
+			// TODO Save the content type during upload ?
 	        headers.setContentType(MediaType.IMAGE_JPEG);
 	        headers.setContentLength(img.getImage().length);
 	        return new HttpEntity<byte[]>(img.getImage(), headers);
