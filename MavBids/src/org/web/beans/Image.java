@@ -2,14 +2,21 @@ package org.web.beans;
 
 public class Image {
 
-	private int imageId;
+	private int id;
+	private int adId;
 	private byte[] image;
 
-	public int getImageId() {
-		return imageId;
+	public int getId() {
+		return id;
 	}
-	public void setImageId(int imageId) {
-		this.imageId = imageId;
+	public void setId(int id) {
+		this.id = id;
+	}
+	public int getAdId() {
+		return adId;
+	}
+	public void setAdId(int adId) {
+		this.adId = adId;
 	}
 	public byte[] getImage() {
 		return image;

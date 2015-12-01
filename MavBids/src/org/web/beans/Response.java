@@ -1,8 +1,14 @@
 package org.web.beans;
 
-public class Status {
+public class Response {
 	public String type;
 	public String message;
+	public Object result;
+
+	public Response() {
+		type = "success";
+		message = "ok";
+	}
 
 	public String getType() {
 		return type;
@@ -15,5 +21,11 @@ public class Status {
 	}
 	public void setMessage(String message) {
 		this.message = message;
+	}
+	public Object getResult() {
+		return result;
+	}
+	public void setResult(Object result) {
+		this.result = result;
 	}
 }

@@ -3,15 +3,22 @@ package org.web.dao;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
+import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Component;
+import org.web.beans.Advertisement;
+import org.web.beans.Bid;
 import org.web.beans.Category;
+import org.web.beans.DirectBuy;
 import org.web.beans.Image;
-import org.web.beans.UserProfile;
+import org.web.beans.Review;
+import org.web.beans.User;
 
 @Component
 public class DBMgr {
@@ -28,26 +35,126 @@ public class DBMgr {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<UserProfile> listUserProfiles() {
-		Session session = factory.openSession();
+	public boolean saveUser(User user){
 		Transaction tx = null;
-		List<UserProfile> userProfiles = null;
+		Session session = factory.openSession();
+		tx = session.beginTransaction();
 
-		try {
-			tx = session.beginTransaction();
-			userProfiles = session.createQuery("FROM UserProfile").list();
+		session.save(user);
+		tx.commit();
 
-			tx.commit();
-		} catch (HibernateException e) {
-			if (tx != null)
-				tx.rollback();
-			logger.error("Failed to execute Hibernate transaction : " + e);
-		} finally {
-			session.close();
-		}
+		session.close();
+		return true;
+	}
 
-		return userProfiles;
+	public User getUser(String emailId){
+		Session session = factory.openSession();
+		Query q = session.createQuery("from User where email = :email");
+
+		@SuppressWarnings("unchecked")
+		List<User> userList = q.setParameter("email", emailId).list();
+
+		if(userList.size() >= 1)
+			return userList.get(0);
+		else
+			return null;
+	}
+
+	public int saveAdvertisement(Advertisement adv){
+		Transaction tx = null;
+		Session session = factory.openSession();
+		tx = session.beginTransaction();
+
+		int advId = (Integer) session.save(adv);
+		tx.commit();
+
+		session.close();
+		return advId;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Advertisement> getAdvertisements(int rlimit, String byUserId, String status, String forUserId){
+		Session session = factory.openSession();
+		List<Advertisement> advList;
+
+		Criteria criteria = session.createCriteria(Advertisement.class);
+		criteria.addOrder(Order.desc("startDate"));
+
+		if(status != null && !status.isEmpty())
+			criteria.add(Restrictions.eq("status", status));
+
+		if(byUserId != null && !byUserId.isEmpty())
+			criteria.add(Restrictions.eq("sellerId", Double.parseDouble(byUserId)));
+
+		if(forUserId != null && !forUserId.isEmpty())
+			criteria.add(Restrictions.ne("sellerId", Double.parseDouble(forUserId)));
+
+		if(rlimit > -1)
+			criteria.setMaxResults(rlimit);
+
+		advList = criteria.list();
+		session.close();
+		return advList;
+	}
+
+
+	public List<Advertisement> getAdvertisementByName(String itemName){
+		Session session = factory.openSession();
+
+		@SuppressWarnings("unchecked")
+		List<Advertisement> advList = session.createCriteria(Advertisement.class)
+										.add(Restrictions.like("itemName", "%" + itemName  + "%"))
+										.list();
+
+		return advList;
+	}
+
+	public List<Advertisement> getMyOrders(String userId){
+		Session session = factory.openSession();
+
+		@SuppressWarnings("unchecked")
+		List<Advertisement> advList = session.createCriteria(Advertisement.class)
+							.add(Restrictions.eq("buyer", Double.parseDouble(userId)))
+							.add(Restrictions.eq("status", "SOLD"))
+							.list();
+
+		return advList;
+	}
+
+	public boolean saveBid(Bid bid){
+		Transaction tx = null;
+		Session session = factory.openSession();
+		tx = session.beginTransaction();
+
+		session.save(bid);
+		tx.commit();
+
+		session.close();
+		return true;
+	}
+
+	public boolean directBuy(DirectBuy directBuy){
+		Transaction tx = null;
+		Session session = factory.openSession();
+		tx = session.beginTransaction();
+
+		session.save(directBuy);
+		tx.commit();
+
+		session.close();
+		return true;
+	}
+
+	public boolean addReview(Review review){
+		Transaction tx = null;
+		Session session = factory.openSession();
+		tx = session.beginTransaction();
+
+		session.save(review);
+		tx.commit();
+
+		session.close();
+		return true;
 	}
 
 
@@ -72,12 +179,18 @@ public class DBMgr {
 		return true;
 	}
 
-	public Image getImage(int imageId){
+	public Image getImage(int advImageId){
 		Session session = factory.openSession();
 
-		Image image = (Image) session.get(Image.class, imageId);
-
+		@SuppressWarnings("unchecked")
+		List<Image> imgList = session.createCriteria(Image.class)
+								.add(Restrictions.eq("adId", advImageId))
+								.list();
 		session.close();
-		return image;
+
+		if(imgList.size() > 0)
+			return imgList.get(0);
+		else
+			return null;
 	}
 }
